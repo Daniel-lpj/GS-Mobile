@@ -166,21 +166,25 @@ const Sensor = () => {
             {sensor?.map((item) => (
               <Card key={item.sensor_id} containerStyle={styles.smallCard}>
                 <Input
-                  placeholder="Data de Cadastro"
+                  label="Data de Cadastro"
                   value={item.dataCadastro}
                   leftIcon={{ type: "font-awesome", name: "calendar" }}
+                  labelStyle={styles.label}
                   disabled={!edicaoAtiva}
                   inputStyle={styles.inputText}
                 />
                 <Input
-                  placeholder="Data de Atualização"
+                  label="Data de Atualização"
                   value={item.dataAtualizacao}
                   leftIcon={{ type: "font-awesome", name: "calendar" }}
+                  labelStyle={styles.label}
                   disabled={!edicaoAtiva}
                   inputStyle={styles.inputText}
                 />
                 <View style={styles.switchContainerSmall}>
-                  <Text>Ativo: {item.botaoAtivo === true ? "Sim" : "Não"}</Text>
+                  <Text style={styles.textAtivo}>
+                    Ativo: {item.botaoAtivo === true ? "Sim" : "Não"}
+                  </Text>
                 </View>
                 {!edicaoAtiva && (
                   <View style={styles.iconContainer}>
@@ -267,7 +271,7 @@ const styles = StyleSheet.create({
   },
   smallCard: {
     width: "90%",
-    height: 250,
+    height: 290,
     marginBottom: 10,
     backgroundColor: "#ffffff",
     borderRadius: 10,
@@ -286,10 +290,18 @@ const styles = StyleSheet.create({
   inputText: {
     color: "#000000",
   },
+  label: {
+    color: "#000000",
+    marginBottom: 5,
+  },
   text: {
     fontSize: 30,
     color: "#000000",
     fontWeight: "bold",
+  },
+  textAtivo: {
+    fontSize: 16,
+    color: "#000000",
   },
 });
 
