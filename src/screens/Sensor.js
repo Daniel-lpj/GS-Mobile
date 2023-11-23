@@ -24,41 +24,62 @@ const Sensor = () => {
           dataAtualizacao,
           botaoAtivo,
         });
-        const temp = [...sensor];
-        const index = temp.findIndex((item) => item.id === idEdicao);
-        temp[index] = response.data;
-        setEdicaoAtiva(false);
-        setIdEdicao(null);
-        getSensor();
+        const { status } = response;
+
+        if (status === 200) {
+          const temp = [...sensor];
+          const index = temp.findIndex((item) => item.id === idEdicao);
+          temp[index] = response.data;
+          setEdicaoAtiva(false);
+          setIdEdicao(null);
+          getSensor();
+          Alert.alert("Sensor atualizado com sucesso!");
+        } else {
+          throw new Error(`Erro ao atualizar sensor. Status: ${status}`);
+        }
       } else {
-        await api.post("sensor", {
+        const response = await api.post("sensor", {
           dataCadastro,
           dataAtualizacao,
           botaoAtivo,
         });
-        getSensor();
+        const { status } = response;
+
+        if (status === 201) {
+          getSensor();
+          Alert.alert("Sensor adicionado com sucesso!");
+        } else {
+          throw new Error("Erro ao salvar sensor");
+        }
       }
 
       setDataCadastro("");
       setDataAtualizacao("");
       setBotaoAtivo(false);
     } catch (error) {
-      console.error("Erro ao salvar dados:", error);
+      handleError(error, "Erro ao salvar dados do sensor");
     }
   };
 
   const handleEdit = async (id) => {
     try {
       const response = await api.get(`sensor/${id}`);
-      const itemParaEdicao = response.data;
+      const { status } = response;
 
-      setEdicaoAtiva(true);
-      setIdEdicao(id);
-      setDataCadastro(itemParaEdicao.dataCadastro);
-      setDataAtualizacao(itemParaEdicao.dataAtualizacao);
-      setBotaoAtivo(itemParaEdicao.botaoAtivo);
+      if (status === 200) {
+        const itemParaEdicao = response.data;
+        setEdicaoAtiva(true);
+        setIdEdicao(id);
+        setDataCadastro(itemParaEdicao.dataCadastro);
+        setDataAtualizacao(itemParaEdicao.dataAtualizacao);
+        setBotaoAtivo(itemParaEdicao.botaoAtivo);
+      } else {
+        throw new Error(
+          `Erro ao carregar os dados do sensor para edição. Status: ${status}`
+        );
+      }
     } catch (error) {
-      console.error("Erro ao carregar dados para edição:", error);
+      handleError(error, "Erro ao carregar dados do sensor para edição");
     }
   };
 
@@ -69,7 +90,6 @@ const Sensor = () => {
 
       if (status === 204) {
         const temp = sensor.filter((_, index) => index !== sensor_id);
-
         setSensor(temp);
         getSensor();
         Alert.alert("Sensor excluído com sucesso!");
