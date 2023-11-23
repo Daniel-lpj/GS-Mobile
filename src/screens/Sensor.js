@@ -28,7 +28,7 @@ const Sensor = () => {
 
         if (status === 200) {
           const temp = [...sensor];
-          const index = temp.findIndex((item) => item.id === idEdicao);
+          const index = temp.findIndex((item) => item.sensor_id === idEdicao);
           temp[index] = response.data;
           setEdicaoAtiva(false);
           setIdEdicao(null);
@@ -61,15 +61,15 @@ const Sensor = () => {
     }
   };
 
-  const handleEdit = async (id) => {
+  const handleEdit = async (sensor_id) => {
     try {
-      const response = await api.get(`sensor/${id}`);
+      const response = await api.get(`sensor/${sensor_id}`);
       const { status } = response;
 
       if (status === 200) {
         const itemParaEdicao = response.data;
         setEdicaoAtiva(true);
-        setIdEdicao(id);
+        setIdEdicao(sensor_id);
         setDataCadastro(itemParaEdicao.dataCadastro);
         setDataAtualizacao(itemParaEdicao.dataAtualizacao);
         setBotaoAtivo(itemParaEdicao.botaoAtivo);
