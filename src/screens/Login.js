@@ -7,6 +7,10 @@ const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
+  const handleCadastro = () => {
+    navigation.navigate("Cadastro");
+  };
+
   const handleLogin = async () => {
     const obj = {
       email: email,
@@ -51,11 +55,18 @@ const Login = ({ navigation }) => {
         containerStyle={styles.inputContainer}
         inputStyle={styles.inputText}
       />
-      <Button
-        title="Entrar"
-        onPress={handleLogin}
-        buttonStyle={styles.button}
-      />
+      <View>
+        <Button
+          title="Entrar"
+          onPress={handleLogin}
+          buttonStyle={styles.button}
+        />
+        <Button
+          title="Cadastre-se"
+          onPress={handleCadastro}
+          buttonStyle={styles.button}
+        />
+      </View>
     </View>
   );
 };
