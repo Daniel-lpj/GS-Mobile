@@ -3,28 +3,30 @@ import { Alert, Image, StyleSheet, View } from "react-native";
 import { Button, Input } from "react-native-elements";
 import api from "../utils/api";
 
-const Login = ({ navigation }) => {
+const Cadastro = ({ navigation }) => {
+  const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  const handleLogin = async () => {
+  const handleCadastro = async () => {
     const obj = {
+      nome: nome,
       email: email,
       senha: senha,
     };
 
     try {
-      const response = await api.post("/login", obj);
+      const response = await api.post("/registrar", obj);
 
       if (response.status === 201) {
-        Alert.alert("Login bem-sucedido!");
-        navigation.navigate("Roupa");
+        Alert.alert("Cadastro bem-sucedido!");
+        navigation.navigate("Login");
       } else {
-        Alert.alert("Falha no login. Verifique sua senha.");
+        Alert.alert("Falha no cadastro. Verifique seus dados.");
       }
     } catch (error) {
-      console.error("Erro ao fazer o login:", error);
-      Alert.alert("Erro ao fazer o login. Tente novamente mais tarde.");
+      console.error("Erro ao fazer o cadastro:", error);
+      Alert.alert("Erro ao fazer o cadastro. Tente novamente mais tarde.");
     }
   };
 
@@ -33,6 +35,14 @@ const Login = ({ navigation }) => {
       <Image
         source={require("../../assets/ImageBackground.jpg")}
         style={styles.backgroundImage}
+      />
+      <Input
+        placeholder="Nome"
+        leftIcon={{ type: "font-awesome", name: "user" }}
+        onChangeText={setNome}
+        value={nome}
+        containerStyle={styles.inputContainer}
+        inputStyle={styles.inputText}
       />
       <Input
         placeholder="Email"
@@ -52,8 +62,8 @@ const Login = ({ navigation }) => {
         inputStyle={styles.inputText}
       />
       <Button
-        title="Entrar"
-        onPress={handleLogin}
+        title="Cadastrar"
+        onPress={handleCadastro}
         buttonStyle={styles.button}
       />
     </View>
@@ -85,4 +95,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login;
+export default Cadastro;
