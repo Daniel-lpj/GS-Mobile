@@ -135,18 +135,16 @@ const Sensor = () => {
           <Card containerStyle={styles.mainCard}>
             <Input
               placeholder="Data de Cadastro"
-              label="Data de Cadastro"
+              leftIcon={{ type: "font-awesome", name: "calendar" }}
               onChangeText={setDataCadastro}
               value={dataCadastro}
-              labelStyle={styles.label}
               containerStyle={styles.inputContainer}
             />
             <Input
               placeholder="Data de Atualização"
-              label="Data de Atualização"
+              leftIcon={{ type: "font-awesome", name: "calendar" }}
               onChangeText={setDataAtualizacao}
               value={dataAtualizacao}
-              labelStyle={styles.label}
               containerStyle={styles.inputContainer}
             />
             <View style={styles.switchContainer}>
@@ -166,21 +164,19 @@ const Sensor = () => {
 
           <ScrollView style={styles.cardListContainer}>
             {sensor?.map((item) => (
-              <Card key={item.sensor_id} style={styles.smallCard}>
+              <Card key={item.sensor_id} containerStyle={styles.smallCard}>
                 <Input
                   placeholder="Data de Cadastro"
-                  label="Data de Cadastro"
                   value={item.dataCadastro}
+                  leftIcon={{ type: "font-awesome", name: "calendar" }}
                   disabled={!edicaoAtiva}
-                  labelStyle={styles.label}
                   inputStyle={styles.inputText}
                 />
                 <Input
                   placeholder="Data de Atualização"
-                  label="Data de Atualização"
                   value={item.dataAtualizacao}
+                  leftIcon={{ type: "font-awesome", name: "calendar" }}
                   disabled={!edicaoAtiva}
-                  labelStyle={styles.label}
                   inputStyle={styles.inputText}
                 />
                 <View style={styles.switchContainerSmall}>
@@ -231,7 +227,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   inputContainer: {
-    width: 175,
+    width: 200,
   },
   mainCard: {
     width: "90%",
@@ -243,10 +239,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     elevation: 3,
-  },
-  label: {
-    color: "#000000",
-    marginBottom: 5,
   },
   switchContainer: {
     flexDirection: "row",
@@ -274,8 +266,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   smallCard: {
-    width: "100%",
-    height: 120,
+    width: "90%",
+    height: 250,
     marginBottom: 10,
     backgroundColor: "#ffffff",
     borderRadius: 10,
