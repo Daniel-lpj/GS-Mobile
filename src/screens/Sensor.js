@@ -1,74 +1,104 @@
-import React, { useState } from "react";
-import { Image, ScrollView, StyleSheet, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, Image, ScrollView, StyleSheet, View } from "react-native";
 import { Button, Card, Icon, Input, Switch, Text } from "react-native-elements";
+import api from "../utils/api";
 
 const Sensor = () => {
   const [dataCadastro, setDataCadastro] = useState("");
   const [dataAtualizacao, setDataAtualizacao] = useState("");
-  const [ativo, setAtivo] = useState(false);
-  const [sensor, setSensor] = useState([
-    {
-      id: 1,
-      dataCadastro: "01/01/2023",
-      dataAtualizacao: "31/01/2023",
-      ativo: true,
-    },
-    {
-      id: 2,
-      dataCadastro: "01/02/2023",
-      dataAtualizacao: "28/02/2023",
-      ativo: false,
-    },
-  ]);
-
+  const [botaoAtivo, setBotaoAtivo] = useState(false);
   const [edicaoAtiva, setEdicaoAtiva] = useState(false);
   const [idEdicao, setIdEdicao] = useState(null);
+  const [sensor, setSensor] = useState([]);
 
-  const handleSave = () => {
-    if (edicaoAtiva) {
-      const index = sensor?.findIndex((item) => item?.id === idEdicao);
-      if (index !== -1) {
+  const handleError = (error, message) => {
+    console.error(`${message}:`, error);
+    Alert.alert(message, error.message || "Erro desconhecido");
+  };
+
+  const handleSave = async () => {
+    try {
+      if (edicaoAtiva) {
+        const response = await api.put(`sensor/${idEdicao}`, {
+          dataCadastro,
+          dataAtualizacao,
+          botaoAtivo,
+        });
         const temp = [...sensor];
-        temp[index] = {
-          id: idEdicao,
-          dataCadastro: dataCadastro,
-          dataAtualizacao: dataAtualizacao,
-          ativo: ativo,
-        };
-        setSensor(temp);
+        const index = temp.findIndex((item) => item.id === idEdicao);
+        temp[index] = response.data;
+        getSensor();
         setEdicaoAtiva(false);
         setIdEdicao(null);
+      } else {
+        const response = await api.post("sensor", {
+          dataCadastro,
+          dataAtualizacao,
+          botaoAtivo,
+        });
+        getSensor();
       }
-    } else {
-      const novoItem = {
-        id: sensor?.length + 1,
-        dataCadastro: dataCadastro,
-        dataAtualizacao: dataAtualizacao,
-        ativo: ativo,
-      };
-      setSensor([...sensor, novoItem]);
-    }
 
-    setDataCadastro("");
-    setDataAtualizacao("");
-    setAtivo(false);
+      setDataCadastro("");
+      setDataAtualizacao("");
+      setBotaoAtivo(false);
+    } catch (error) {
+      console.error("Erro ao salvar dados:", error);
+    }
   };
 
-  const handleEdit = (id) => {
-    const itemParaEdicao = sensor?.find((item) => item?.id === id);
-    if (itemParaEdicao) {
+  const handleEdit = async (id) => {
+    try {
+      const response = await api.get(`sensor/${id}`);
+      const itemParaEdicao = response.data;
+
       setEdicaoAtiva(true);
       setIdEdicao(id);
-      setDataCadastro(itemParaEdicao?.dataCadastro);
-      setDataAtualizacao(itemParaEdicao?.dataAtualizacao);
-      setAtivo(itemParaEdicao?.ativo);
+      setDataCadastro(itemParaEdicao.dataCadastro);
+      setDataAtualizacao(itemParaEdicao.dataAtualizacao);
+      setBotaoAtivo(itemParaEdicao.botaoAtivo);
+    } catch (error) {
+      console.error("Erro ao carregar dados para edição:", error);
     }
   };
 
-  const handleDelete = (id) => {
-    const temp = sensor?.filter((item) => item?.id !== id);
-    setSensor(temp);
+  const handleDelete = async (sensor_id) => {
+    try {
+      const response = await api.delete(`/sensor/${sensor_id}`);
+      const { status } = response;
+
+      if (status === 204) {
+        const temp = sensor.filter((_, index) => index !== sensor_id);
+
+        setSensor(temp);
+        getSensor();
+        Alert.alert("Sensor excluído com sucesso!");
+      } else {
+        throw new Error(`Erro ao excluir sensor. Status: ${status}`);
+      }
+    } catch (error) {
+      handleError(error, "Erro ao excluir sensor");
+    }
   };
+
+  const getSensor = async () => {
+    try {
+      const response = await api.get("/sensor");
+      const { status, data } = response;
+
+      if (status === 200) {
+        setSensor(data);
+      } else {
+        throw new Error("Erro ao buscar lista de sensores");
+      }
+    } catch (error) {
+      handleError(error, "Erro ao buscar lista de sensores");
+    }
+  };
+
+  useEffect(() => {
+    getSensor();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -96,8 +126,8 @@ const Sensor = () => {
         <View style={styles.switchContainer}>
           <Text style={styles.switchLabel}>Ativo</Text>
           <Switch
-            value={ativo}
-            onValueChange={() => setAtivo(!ativo)}
+            value={botaoAtivo}
+            onValueChange={() => setBotaoAtivo(!botaoAtivo)}
             color="#3498db"
           />
         </View>
@@ -110,7 +140,7 @@ const Sensor = () => {
 
       <ScrollView style={styles.cardListContainer}>
         {sensor?.map((item) => (
-          <Card key={item.id} style={styles.smallCard}>
+          <Card key={item.sensor_id} style={styles.smallCard}>
             <Input
               placeholder="Data de Cadastro"
               label="Data de Cadastro"
@@ -128,7 +158,7 @@ const Sensor = () => {
               inputStyle={styles.inputText}
             />
             <View style={styles.switchContainerSmall}>
-              <Text>Ativo: {item.ativo ? "Sim" : "Não"}</Text>
+              <Text>Ativo: {item.botaoAtivo === true ? "Sim" : "Não"}</Text>
             </View>
             {!edicaoAtiva && (
               <View style={styles.iconContainer}>
@@ -137,14 +167,14 @@ const Sensor = () => {
                   name="pencil"
                   type="font-awesome"
                   color="#3498db"
-                  onPress={() => handleEdit(item.id)}
+                  onPress={() => handleEdit(item.sensor_id)}
                 />
                 <Icon
                   style={styles.iconBox}
                   name="trash"
                   type="font-awesome"
                   color="#e74c3c"
-                  onPress={() => handleDelete(item.id)}
+                  onPress={() => handleDelete(item.sensor_id)}
                 />
               </View>
             )}
