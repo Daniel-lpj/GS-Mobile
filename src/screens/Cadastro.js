@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     color: "#000000",
   },
   button: {
-    backgroundColor: "#3498ba",
+    backgroundColor: "#3498db",
     marginTop: 10,
   },
 });
