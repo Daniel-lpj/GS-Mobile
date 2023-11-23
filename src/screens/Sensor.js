@@ -1,62 +1,74 @@
-import React, { useEffect, useState } from "react";
-import { Alert, Image, StyleSheet, View } from "react-native";
-import { Button, Card, Input, Switch } from "react-native-elements";
-import api from "../utils/api";
+import React, { useState } from "react";
+import { Image, ScrollView, StyleSheet, View } from "react-native";
+import { Button, Card, Icon, Input, Switch, Text } from "react-native-elements";
 
 const Sensor = () => {
-  const [dataInicio, setDataInicio] = useState("");
-  const [dataFim, setDataFim] = useState("");
+  const [dataCadastro, setDataCadastro] = useState("");
+  const [dataAtualizacao, setDataAtualizacao] = useState("");
   const [ativo, setAtivo] = useState(false);
-  const [sensor, setSensor] = useState([]);
+  const [sensor, setSensor] = useState([
+    {
+      id: 1,
+      dataCadastro: "01/01/2023",
+      dataAtualizacao: "31/01/2023",
+      ativo: true,
+    },
+    {
+      id: 2,
+      dataCadastro: "01/02/2023",
+      dataAtualizacao: "28/02/2023",
+      ativo: false,
+    },
+  ]);
 
-  const handleError = (error, message) => {
-    console.error(`${message}:`, error);
-    Alert.alert(message, error.message || "Erro desconhecido");
+  const [edicaoAtiva, setEdicaoAtiva] = useState(false);
+  const [idEdicao, setIdEdicao] = useState(null);
+
+  const handleSave = () => {
+    if (edicaoAtiva) {
+      const index = sensor?.findIndex((item) => item?.id === idEdicao);
+      if (index !== -1) {
+        const temp = [...sensor];
+        temp[index] = {
+          id: idEdicao,
+          dataCadastro: dataCadastro,
+          dataAtualizacao: dataAtualizacao,
+          ativo: ativo,
+        };
+        setSensor(temp);
+        setEdicaoAtiva(false);
+        setIdEdicao(null);
+      }
+    } else {
+      const novoItem = {
+        id: sensor?.length + 1,
+        dataCadastro: dataCadastro,
+        dataAtualizacao: dataAtualizacao,
+        ativo: ativo,
+      };
+      setSensor([...sensor, novoItem]);
+    }
+
+    setDataCadastro("");
+    setDataAtualizacao("");
+    setAtivo(false);
   };
 
-  const handleSaveSensor = async () => {
-    const obj = {
-      dataInicio: dataInicio,
-      dataFim: dataFim,
-      ativo: ativo,
-    };
-
-    try {
-      const response = await api.post("/sensor", obj);
-      const { status } = response;
-
-      if (status === 201) {
-        getSensor();
-        Alert.alert("Sensor adicionado com sucesso!");
-      } else {
-        throw new Error(`Falha ao adicionar sensor. Status: ${status}`);
-      }
-    } catch (error) {
-      handleError(
-        error,
-        "Erro ao adicionar sensor. Tente novamente mais tarde."
-      );
+  const handleEdit = (id) => {
+    const itemParaEdicao = sensor?.find((item) => item?.id === id);
+    if (itemParaEdicao) {
+      setEdicaoAtiva(true);
+      setIdEdicao(id);
+      setDataCadastro(itemParaEdicao?.dataCadastro);
+      setDataAtualizacao(itemParaEdicao?.dataAtualizacao);
+      setAtivo(itemParaEdicao?.ativo);
     }
   };
 
-  const getSensor = async () => {
-    try {
-      const response = await api.get("/sensor");
-      const { status, data } = response;
-
-      if (status === 200) {
-        setSensor(data);
-      } else {
-        throw new Error("Erro ao buscar lista de sensores");
-      }
-    } catch (error) {
-      handleError(error, "Erro ao buscar lista de sensores");
-    }
+  const handleDelete = (id) => {
+    const temp = sensor?.filter((item) => item?.id !== id);
+    setSensor(temp);
   };
-
-  useEffect(() => {
-    getSensor();
-  }, []);
 
   return (
     <View style={styles.container}>
@@ -64,70 +76,81 @@ const Sensor = () => {
         source={require("../../assets/ImageBackground.jpg")}
         style={styles.backgroundImage}
       />
-      {!sensor ? (
-        sensor?.map((item, index) => (
-          <Card key={index} containerStyle={styles.cardContainer}>
+      <Card containerStyle={styles.mainCard}>
+        <Input
+          placeholder="Data de Cadastro"
+          label="Data de Cadastro"
+          onChangeText={setDataCadastro}
+          value={dataCadastro}
+          labelStyle={styles.label}
+          containerStyle={styles.inputContainer}
+        />
+        <Input
+          placeholder="Data de Atualização"
+          label="Data de Atualização"
+          onChangeText={setDataAtualizacao}
+          value={dataAtualizacao}
+          labelStyle={styles.label}
+          containerStyle={styles.inputContainer}
+        />
+        <View style={styles.switchContainer}>
+          <Text style={styles.switchLabel}>Ativo</Text>
+          <Switch
+            value={ativo}
+            onValueChange={() => setAtivo(!ativo)}
+            color="#3498db"
+          />
+        </View>
+        <Button
+          title={edicaoAtiva ? "Atualizar" : "Adicionar"}
+          onPress={handleSave}
+          buttonStyle={styles.button}
+        />
+      </Card>
+
+      <ScrollView style={styles.cardListContainer}>
+        {sensor?.map((item) => (
+          <Card key={item.id} style={styles.smallCard}>
             <Input
-              disabled
-              placeholder="Data de Início"
-              label="Data de Início"
-              value={item?.dataInicio}
-              leftIcon={{ type: "font-awesome", name: "calendar" }}
+              placeholder="Data de Cadastro"
+              label="Data de Cadastro"
+              value={item.dataCadastro}
+              disabled={!edicaoAtiva}
               labelStyle={styles.label}
-              containerStyle={styles.inputContainer}
               inputStyle={styles.inputText}
             />
             <Input
-              disabled
-              placeholder="Data de Fim"
-              label="Data de Fim"
-              value={item?.dataInicio}
-              leftIcon={{ type: "font-awesome", name: "calendar" }}
+              placeholder="Data de Atualização"
+              label="Data de Atualização"
+              value={item.dataAtualizacao}
+              disabled={!edicaoAtiva}
               labelStyle={styles.label}
-              containerStyle={styles.inputContainer}
               inputStyle={styles.inputText}
             />
-            <View style={styles.switchContainer}>
-              <Switch value={item?.ativo} color="#3498db" />
+            <View style={styles.switchContainerSmall}>
+              <Text>Ativo: {item.ativo ? "Sim" : "Não"}</Text>
             </View>
+            {!edicaoAtiva && (
+              <View style={styles.iconContainer}>
+                <Icon
+                  style={styles.iconBox}
+                  name="pencil"
+                  type="font-awesome"
+                  color="#3498db"
+                  onPress={() => handleEdit(item.id)}
+                />
+                <Icon
+                  style={styles.iconBox}
+                  name="trash"
+                  type="font-awesome"
+                  color="#e74c3c"
+                  onPress={() => handleDelete(item.id)}
+                />
+              </View>
+            )}
           </Card>
-        ))
-      ) : (
-        <Card containerStyle={styles.cardContainer}>
-          <Input
-            placeholder="Data de Início"
-            label="Data de Início"
-            onChangeText={setDataInicio}
-            value={dataInicio}
-            leftIcon={{ type: "font-awesome", name: "calendar" }}
-            labelStyle={styles.label}
-            containerStyle={styles.inputContainer}
-            inputStyle={styles.inputText}
-          />
-          <Input
-            placeholder="Data de Fim"
-            label="Data de Fim"
-            onChangeText={setDataFim}
-            value={dataFim}
-            leftIcon={{ type: "font-awesome", name: "calendar" }}
-            labelStyle={styles.label}
-            containerStyle={styles.inputContainer}
-            inputStyle={styles.inputText}
-          />
-          <View style={styles.switchContainer}>
-            <Switch
-              value={ativo}
-              onValueChange={() => setAtivo(!ativo)}
-              color="#3498db"
-            />
-          </View>
-          <Button
-            title="Salvar"
-            onPress={handleSaveSensor}
-            buttonStyle={styles.button}
-          />
-        </Card>
-      )}
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -135,9 +158,9 @@ const Sensor = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#ecf0f1",
   },
   backgroundImage: {
     position: "absolute",
@@ -145,31 +168,69 @@ const styles = StyleSheet.create({
     height: "100%",
     resizeMode: "cover",
   },
-  cardContainer: {
-    width: "50%",
-    margin: 25,
+  inputContainer: {
+    width: 175,
+  },
+  mainCard: {
+    width: "90%",
+    height: "50%",
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 20,
+    backgroundColor: "#ffffff",
     borderRadius: 10,
+    padding: 10,
+    elevation: 3,
   },
   label: {
     color: "#000000",
     marginBottom: 5,
   },
-  inputContainer: {
-    marginVertical: 10,
-    width: "80%",
-  },
-  inputText: {
-    color: "#000000",
-  },
   switchContainer: {
-    marginVertical: 10,
+    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
+    marginTop: 5,
+    marginBottom: 10,
+  },
+  switchLabel: {
+    marginRight: 10,
+  },
+  switchContainerSmall: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+    marginLeft: 10,
   },
   button: {
     backgroundColor: "#3498db",
     marginTop: 10,
+  },
+  cardListContainer: {
+    width: "90%",
+    height: "50%",
+    marginTop: 10,
+  },
+  smallCard: {
+    width: "100%",
+    height: 120,
+    marginBottom: 10,
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    padding: 10,
+    elevation: 3,
+  },
+  iconContainer: {
+    flexDirection: "row",
+    marginTop: 10,
+    justifyContent: "flex-end",
+  },
+  iconBox: {
+    padding: 5,
+    marginRight: 5,
+  },
+  inputText: {
+    color: "#000000",
   },
 });
 
