@@ -27,11 +27,11 @@ const Sensor = () => {
         const temp = [...sensor];
         const index = temp.findIndex((item) => item.id === idEdicao);
         temp[index] = response.data;
-        getSensor();
         setEdicaoAtiva(false);
         setIdEdicao(null);
+        getSensor();
       } else {
-        const response = await api.post("sensor", {
+        await api.post("sensor", {
           dataCadastro,
           dataAtualizacao,
           botaoAtivo,
