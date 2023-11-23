@@ -18,7 +18,7 @@ const Login = ({ navigation }) => {
 
       if (response.status === 201) {
         Alert.alert("Login bem-sucedido!");
-        navigation.navigate("Roupa");
+        navigation.navigate("Sensor");
       } else {
         Alert.alert("Falha no login. Verifique sua senha.");
       }

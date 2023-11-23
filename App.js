@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ContextProvider from "./src/hooks/context";
 import Cadastro from "./src/screens/Cadastro";
 import Login from "./src/screens/Login";
+import Sensor from "./src/screens/Sensor";
 
 const Stack = createNativeStackNavigator();
 
@@ -11,11 +12,12 @@ export default function App() {
     <ContextProvider>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Login"
+          initialRouteName="Sensor"
           screenOptions={{ headerShown: false }}
         >
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Cadastro" component={Cadastro} />
+          <Stack.Screen name="Sensor" component={Sensor} />
         </Stack.Navigator>
       </NavigationContainer>
     </ContextProvider>
