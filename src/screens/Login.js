@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { Alert, Image, StyleSheet, View } from "react-native";
 import { Button, Input } from "react-native-elements";
+import { useAppContext } from "../hooks/context";
 import api from "../utils/api";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+
+  const { setToken } = useAppContext();
 
   const handleCadastro = () => {
     navigation.navigate("Cadastro");
@@ -21,6 +24,7 @@ const Login = ({ navigation }) => {
       const response = await api.post("/login", obj);
 
       if (response.status === 200) {
+        setToken(response.data.token);
         Alert.alert("Login bem-sucedido!");
         navigation.navigate("Sensor");
       } else {

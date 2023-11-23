@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Image, ScrollView, StyleSheet, View } from "react-native";
 import { Button, Card, Icon, Input, Switch, Text } from "react-native-elements";
+import { useAppContext } from "../hooks/context";
 import api from "../utils/api";
 
 const Sensor = () => {
@@ -10,6 +11,8 @@ const Sensor = () => {
   const [edicaoAtiva, setEdicaoAtiva] = useState(false);
   const [idEdicao, setIdEdicao] = useState(null);
   const [sensor, setSensor] = useState([]);
+
+  const { token } = useAppContext();
 
   const handleError = (error, message) => {
     console.error(`${message}:`, error);
@@ -126,81 +129,90 @@ const Sensor = () => {
         source={require("../../assets/ImageBackground.jpg")}
         style={styles.backgroundImage}
       />
-      <Card containerStyle={styles.mainCard}>
-        <Input
-          placeholder="Data de Cadastro"
-          label="Data de Cadastro"
-          onChangeText={setDataCadastro}
-          value={dataCadastro}
-          labelStyle={styles.label}
-          containerStyle={styles.inputContainer}
-        />
-        <Input
-          placeholder="Data de Atualização"
-          label="Data de Atualização"
-          onChangeText={setDataAtualizacao}
-          value={dataAtualizacao}
-          labelStyle={styles.label}
-          containerStyle={styles.inputContainer}
-        />
-        <View style={styles.switchContainer}>
-          <Text style={styles.switchLabel}>Ativo</Text>
-          <Switch
-            value={botaoAtivo}
-            onValueChange={() => setBotaoAtivo(!botaoAtivo)}
-            color="#3498db"
-          />
-        </View>
-        <Button
-          title={edicaoAtiva ? "Atualizar" : "Adicionar"}
-          onPress={handleSave}
-          buttonStyle={styles.button}
-        />
-      </Card>
 
-      <ScrollView style={styles.cardListContainer}>
-        {sensor?.map((item) => (
-          <Card key={item.sensor_id} style={styles.smallCard}>
+      {token ? (
+        <>
+          <Card containerStyle={styles.mainCard}>
             <Input
               placeholder="Data de Cadastro"
               label="Data de Cadastro"
-              value={item.dataCadastro}
-              disabled={!edicaoAtiva}
+              onChangeText={setDataCadastro}
+              value={dataCadastro}
               labelStyle={styles.label}
-              inputStyle={styles.inputText}
+              containerStyle={styles.inputContainer}
             />
             <Input
               placeholder="Data de Atualização"
               label="Data de Atualização"
-              value={item.dataAtualizacao}
-              disabled={!edicaoAtiva}
+              onChangeText={setDataAtualizacao}
+              value={dataAtualizacao}
               labelStyle={styles.label}
-              inputStyle={styles.inputText}
+              containerStyle={styles.inputContainer}
             />
-            <View style={styles.switchContainerSmall}>
-              <Text>Ativo: {item.botaoAtivo === true ? "Sim" : "Não"}</Text>
+            <View style={styles.switchContainer}>
+              <Text style={styles.switchLabel}>Ativo</Text>
+              <Switch
+                value={botaoAtivo}
+                onValueChange={() => setBotaoAtivo(!botaoAtivo)}
+                color="#3498db"
+              />
             </View>
-            {!edicaoAtiva && (
-              <View style={styles.iconContainer}>
-                <Icon
-                  style={styles.iconBox}
-                  name="pencil"
-                  type="font-awesome"
-                  color="#3498db"
-                  onPress={() => handleEdit(item.sensor_id)}
-                />
-                <Icon
-                  style={styles.iconBox}
-                  name="trash"
-                  type="font-awesome"
-                  color="#e74c3c"
-                  onPress={() => handleDelete(item.sensor_id)}
-                />
-              </View>
-            )}
+            <Button
+              title={edicaoAtiva ? "Atualizar" : "Adicionar"}
+              onPress={handleSave}
+              buttonStyle={styles.button}
+            />
           </Card>
-        ))}
-      </ScrollView>
+
+          <ScrollView style={styles.cardListContainer}>
+            {sensor?.map((item) => (
+              <Card key={item.sensor_id} style={styles.smallCard}>
+                <Input
+                  placeholder="Data de Cadastro"
+                  label="Data de Cadastro"
+                  value={item.dataCadastro}
+                  disabled={!edicaoAtiva}
+                  labelStyle={styles.label}
+                  inputStyle={styles.inputText}
+                />
+                <Input
+                  placeholder="Data de Atualização"
+                  label="Data de Atualização"
+                  value={item.dataAtualizacao}
+                  disabled={!edicaoAtiva}
+                  labelStyle={styles.label}
+                  inputStyle={styles.inputText}
+                />
+                <View style={styles.switchContainerSmall}>
+                  <Text>Ativo: {item.botaoAtivo === true ? "Sim" : "Não"}</Text>
+                </View>
+                {!edicaoAtiva && (
+                  <View style={styles.iconContainer}>
+                    <Icon
+                      style={styles.iconBox}
+                      name="pencil"
+                      type="font-awesome"
+                      color="#3498db"
+                      onPress={() => handleEdit(item.sensor_id)}
+                    />
+                    <Icon
+                      style={styles.iconBox}
+                      name="trash"
+                      type="font-awesome"
+                      color="#e74c3c"
+                      onPress={() => handleDelete(item.sensor_id)}
+                    />
+                  </View>
+                )}
+              </Card>
+            ))}
+          </ScrollView>
+        </>
+      ) : (
+        <View>
+          <Text style={styles.text}>Por favor, faça seu login...</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -281,6 +293,11 @@ const styles = StyleSheet.create({
   },
   inputText: {
     color: "#000000",
+  },
+  text: {
+    fontSize: 30,
+    color: "#000000",
+    fontWeight: "bold",
   },
 });
 

@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 const initialState = {
   token: null,
-  setToken: () => {},
+  setToken: () => "",
 };
 
-export const AppContext = React.createContext(initialState);
+const AppContext = React.createContext(initialState);
 
-const ContextProvider = ({ children }) => {
-  const [token, setToken] = useState(initialState);
+export const ContextProvider = ({ children }) => {
+  const [token, setToken] = useState("");
 
   return (
     <AppContext.Provider value={{ token, setToken }}>
@@ -17,4 +17,4 @@ const ContextProvider = ({ children }) => {
   );
 };
 
-export default ContextProvider;
+export const useAppContext = () => useContext(AppContext);
