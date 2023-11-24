@@ -1,0 +1,26 @@
+http://192.168.0.11:8080/api/login - POST
+Endpoint usado para realizar o login, através uma requisição do tipo POST o backend verifica se as informações passadas pelo usuário (email e senha) já existem no banco de dados e caso sim devolve uma mensagem de sucesso e um token para o front armazenar em seção e caso não um erro.
+
+
+http://192.168.0.11:8080/api/registrar - POST
+Endpoint usado para cadastrar os dados (nome, email, senha) no banco de dados que o usuário preencheu no frontend através de uma requisição do tipo POST.
+
+
+http://192.168.0.11:8080/api/sensor - POST
+Endpoint para cadastrar um novo sensor no banco de dados através uma requisição do tipo POST, os dados necessários são: data de cadastro do sensor, data de atualização do sensor, e se está ativo ou não.
+
+
+http://192.168.0.11:8080/api/sensor - GET
+Endpoint do tipo GET usado para listar todos os sensores cadastrados previamente no banco de dados através de uma requisição do tipo GET.
+
+
+http://192.168.0.11:8080/api/sensor/{id} - PUT
+Endpoint usado para alterar algum dado de um sensor cadastrado no banco de dados através de uma requisição do tipo PUT, sendo necessário informar qual o id do sensor que será atualizado na url da requisição e no corpo os dados que serão atualizados de fato: data de cadastro do sensor, data de atualização do sensor, e se está ativo ou não.
+
+
+http://192.168.0.11:8080/api/sensor/{id} - GET
+Endpoint usado para carregar um sensor em específico já cadastrado previamente no banco de dados através de uma requisição do tipo GET. Sendo necessário informar o id do sensor na URL da requisição. Usado para carregar as informações do sensor ja existentes na tela e depois alterar as informações desejadas e assim confirmar no endpoint do tipo PUT.
+
+
+http://192.168.0.11:8080/api/sensor/{id} - DELETE
+Endpoint usado para excluir um sensor em específico já cadastrado previamente no banco de dados através de uma requisição do tipo DELETE. Sendo necessário informar o id do sensor na URL da requisição.
