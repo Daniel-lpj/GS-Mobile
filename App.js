@@ -1,3 +1,9 @@
+// Bruna Gabriela Moreira RM96283
+// Daniel Luiz Paula Junior RM96235
+// Lucas de Morais Nascimento RM93267
+// Luiz Henrique Paiola Viana RM96124
+
+
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ContextProvider } from "./src/hooks/context";
